@@ -1,6 +1,11 @@
 import { memo, useEffect, useRef } from "react";
 import vertexSource from "./shaders/vertex.vert?raw";
 import fragmentSource from "./shaders/fragment.frag?raw";
+import { createWebGL2Context } from "../../common/createWebGL2Context.ts";
+import { createShaders } from "../../common/createShaders.ts";
+import { createProgram } from "../../common/createProgram.ts";
+import { setBackgroundColor } from "../../common/setBackgroundColor.ts";
+import { handleClick } from "./helpers/handleClick.ts";
 
 export interface TemplateProps {
   isTemplate: boolean;
@@ -10,37 +15,26 @@ export const Template = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = ref.current;
-    const gl = canvas?.getContext("webgl2");
-    if (!gl) return;
+    const context = createWebGL2Context(ref.current);
+    if (!context) return;
+    const { gl, canvas } = context;
+    setBackgroundColor(gl);
 
-    // Устанавливаем цвет
-    gl.clearColor(0.9, 0.9, 0.9, 1.0);
-    // Очищение буфера предварительно определённым цветом
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    const shaders = createShaders({ gl, vertexSource, fragmentSource });
+    if (!shaders) return;
+    const { vertexShader, fragmentShader } = shaders;
 
-    // Создаем шейдеры
-    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    if (!vertexShader || !fragmentShader) return;
-
-    gl.shaderSource(vertexShader, vertexSource);
-    gl.shaderSource(fragmentShader, fragmentSource);
-
-    gl.compileShader(vertexShader);
-    gl.compileShader(fragmentShader);
-
-    const program = gl.createProgram();
+    const program = createProgram({ gl, vertexShader, fragmentShader });
     if (!program) return;
 
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
+    const a_Position = gl.getAttribLocation(program, "a_Position");
+    const u_FragColor = gl.getUniformLocation(program, "u_FragColor");
 
-    gl.useProgram(program);
+    canvas.onmousedown = (ev) =>
+      handleClick({ ev, gl, canvas, a_Position, u_FragColor });
 
-    // Нарисовать точку
-    gl.drawArrays(gl.POINTS, 0, 1);
+    const a_PointSize = gl.getAttribLocation(program, "a_PointSize");
+    gl.vertexAttrib1f(a_PointSize, 10);
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;
