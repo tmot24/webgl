@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { TranslatedTriangle } from "./TranslatedTriangle.tsx";
 
 const meta = {
-  title: "Chapter/3.2 TranslatedTriangle",
+  title: "Chapter/3/2 TranslatedTriangle",
   component: TranslatedTriangle,
   parameters: {
     layout: "centered",
