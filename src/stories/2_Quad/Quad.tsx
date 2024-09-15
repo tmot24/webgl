@@ -10,7 +10,7 @@ export interface TemplateProps {
   isTemplate: boolean;
 }
 
-export const Triangle = memo(() => {
+export const Quad = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -29,9 +29,11 @@ export const Triangle = memo(() => {
     const u_FragColor = gl.getUniformLocation(program, "u_FragColor");
     gl.uniform4f(u_FragColor, 1, 0, 0, 1);
 
-    const vertices = new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+    const vertices = new Float32Array([
+      -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5,
+    ]);
     // Количество вершин
-    const n = 3;
+    const n = 4;
 
     // 1. Создать буферный объект
     const vertexBuffer = gl.createBuffer();
@@ -56,10 +58,8 @@ export const Triangle = memo(() => {
     // a) mode - тип фигуры
     // б) first - номер вершины, с которой должно начинаться рисование
     // в) count - количество вершин
-    gl.drawArrays(gl.TRIANGLES, 0, n);
-    // gl.drawArrays(gl.LINES, 0, n);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
-    // gl.drawArrays(gl.LINE_LOOP, 0, n);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+    // gl.drawArrays(gl.TRIANGLE_FAN, 0, n);
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;
