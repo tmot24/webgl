@@ -1,3 +1,5 @@
+import { get2dCoordinates } from "../../../common/get2dCoordinates.ts";
+
 const g_points: [number, number][] = [];
 const g_colors: [number, number, number, number][] = [];
 
@@ -14,10 +16,7 @@ export const handleClick = ({
   a_Position: number;
   u_FragColor: WebGLUniformLocation | null;
 }) => {
-  const target = ev.target as HTMLCanvasElement;
-  const rect = target.getBoundingClientRect();
-  const x = (ev.clientX - rect.left - canvas.width / 2) / (canvas.width / 2);
-  const y = (canvas.height / 2 - (ev.clientY - rect.top)) / (canvas.height / 2);
+  const { x, y } = get2dCoordinates({ ev, canvas });
   g_points.push([x, y]);
 
   if (x >= 0 && y >= 0) {
