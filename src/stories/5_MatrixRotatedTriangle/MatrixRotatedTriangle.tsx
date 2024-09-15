@@ -6,7 +6,7 @@ import { createShaders } from "../../common/createShaders.ts";
 import { createProgram } from "../../common/createProgram.ts";
 import { setBackgroundColor } from "../../common/setBackgroundColor.ts";
 
-export const Triangle = memo(() => {
+export const MatrixRotatedTriangle = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -25,7 +25,12 @@ export const Triangle = memo(() => {
     const u_FragColor = gl.getUniformLocation(program, "u_FragColor");
     gl.uniform4f(u_FragColor, 1, 0, 0, 1);
 
-    const vertices = new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+    // prettier-ignore
+    const vertices = new Float32Array([
+      0, 0.5,
+      -0.5, -0.5,
+      0.5, -0.5
+    ]);
     // Количество вершин
     const n = 3;
 
@@ -35,27 +40,32 @@ export const Triangle = memo(() => {
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     // 3. Записать данные в буферный объект
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
     const a_Position = gl.getAttribLocation(program, "a_Position");
     // 4. Сохранить ссылку на буферный объект в переменной a_Position
-    // а) index - определяет переменную-атрибут, которой будет выполнено присваивание
-    // б) size - определяет число компонентов на вершину от 1 до 4 (2 - двухмерный)
-    // в) type - определяет формат данных (gl.FLOAT - зависит от типизированного массива (Float32Array))
-    // г) normalized - указывает на необходимость нормализации данных в диапазон [0, 1] или [-1, 1]
-    // д) stride - определяет число байтов между разными элементами данных (по умолчанию 0)
-    // e) offset - определяет смещение (в байтах) от начала буферного объекта
     gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
     // 5. Разрешить присваивание переменной a_Position
     gl.enableVertexAttribArray(a_Position);
 
+    // Передать в вершинный шейдер данные, необходимые для поворота фигуры
+    const ANGLE = 90;
+    const radian = (Math.PI * ANGLE) / 180; // Преобразование в радианы
+    const cosB = Math.cos(radian);
+    const sinB = Math.sin(radian);
+    // prettier-ignore
+    // В WebGL элементы следуют в порядке расположения по столбцам
+    const xformMatrix = new Float32Array([
+      cosB, sinB, 0, 0,
+      -sinB, cosB, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1
+    ]);
+
+    const u_xformMatrix = gl.getUniformLocation(program, "u_xformMatrix");
+    // Передать матрицу вращения в вершинный шейдер
+    // (v - указывает на способность метода записать в переменную множество значений)
+    gl.uniformMatrix4fv(u_xformMatrix, false, xformMatrix);
     // Выполняет вершинный шейдер, чтобы нарисовать фигуры, определяемые параметром mode
-    // a) mode - тип фигуры
-    // б) first - номер вершины, с которой должно начинаться рисование
-    // в) count - количество вершин
     gl.drawArrays(gl.TRIANGLES, 0, n);
-    // gl.drawArrays(gl.LINES, 0, n);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
-    // gl.drawArrays(gl.LINE_LOOP, 0, n);
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;

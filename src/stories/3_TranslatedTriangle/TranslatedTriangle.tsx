@@ -7,10 +7,6 @@ import { createProgram } from "../../common/createProgram.ts";
 import { setBackgroundColor } from "../../common/setBackgroundColor.ts";
 import { get2dCoordinates } from "../../common/get2dCoordinates.ts";
 
-export interface TemplateProps {
-  isTemplate: boolean;
-}
-
 export const TranslatedTriangle = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 

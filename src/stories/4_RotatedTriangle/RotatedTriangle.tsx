@@ -6,10 +6,6 @@ import { createShaders } from "../../common/createShaders.ts";
 import { createProgram } from "../../common/createProgram.ts";
 import { setBackgroundColor } from "../../common/setBackgroundColor.ts";
 
-export interface TemplateProps {
-  isTemplate: boolean;
-}
-
 export const RotatedTriangle = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 

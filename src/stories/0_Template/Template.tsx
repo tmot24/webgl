@@ -7,10 +7,6 @@ import { createProgram } from "../../common/createProgram.ts";
 import { setBackgroundColor } from "../../common/setBackgroundColor.ts";
 import { handleClick } from "./helpers/handleClick.ts";
 
-export interface TemplateProps {
-  isTemplate: boolean;
-}
-
 export const Template = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
