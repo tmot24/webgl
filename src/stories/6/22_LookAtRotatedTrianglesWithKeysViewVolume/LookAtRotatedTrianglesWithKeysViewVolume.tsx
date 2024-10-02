@@ -5,9 +5,9 @@ import { createWebGL2Context } from "../../../common/createWebGL2Context.ts";
 import { createShaders } from "../../../common/createShaders.ts";
 import { createProgram } from "../../../common/createProgram.ts";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
-import { mat4 } from "gl-matrix";
+import { vec3, mat4 } from "gl-matrix";
 
-export const OrthoView = memo(() => {
+export const LookAtRotatedTrianglesWithKeysViewVolume = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -26,17 +26,18 @@ export const OrthoView = memo(() => {
     // prettier-ignore
     const verticesColors = new Float32Array([
       // координаты вершин и цвет
-      0.0,  0.6,  -0.4,  0.4,  1.0,  0.4, // дальний зелёный треугольник
-      -0.5, -0.4,  -0.4,  0.4,  1.0,  0.4,
-      0.5, -0.4,  -0.4,  1.0,  0.4,  0.4,
+      0, 0.5, -0.4, 0.4, 1, 0.4, // дальний зелёный треугольник
+      -0.5, -0.5, -0.4, 0.4, 1, 0.4,
+      0.5, -0.5, -0.4, 1, 0.4, 0.4,
 
-      0.5,  0.4,  -0.2,  1.0,  0.4,  0.4, // жёлтый треугольник в середине
-      -0.5,  0.4,  -0.2,  1.0,  1.0,  0.4,
-      0.0, -0.6,  -0.2,  1.0,  1.0,  0.4,
+      0.5, 0.4, -0.2, 1, 0.4, 0.4, // жёлтый треугольник в середине
+      -0.5, 0.4, -0.2, 1, 1, 0.4,
+      0, -0.6, -0.2, 1, 1, 0.4,
 
-      0.0,  0.5,   0.0,  0.4,  0.4,  1.0, // ближний синий треугольник
-      -0.5, -0.5,   0.0,  0.4,  0.4,  1.0,
-      0.5, -0.5,   0.0,  1.0,  0.4,  0.4,
+      0, 0.5, 0, 0.4, 0.4, 1, // ближний синий треугольник
+      -0.5, -0.5, 0, 0.4, 0.4, 1,
+      0.5, -0.5, 0, 1, 0.4, 0.4
+
     ]);
     const FSIZE = verticesColors.BYTES_PER_ELEMENT;
     const dimension = 3;
@@ -80,73 +81,82 @@ export const OrthoView = memo(() => {
     // 5. Разрешить присваивание переменной a_Position
     gl.enableVertexAttribArray(a_Color);
 
-    const u_ProjMatrix = gl.getUniformLocation(program, "u_ProjMatrix");
-    // Матрица для установки точки взгляда и линии взгляда.
-    const projMatrix = mat4.create();
+    const u_ViewMatrix = gl.getUniformLocation(program, "u_ViewMatrix");
+    // Создаём матрицу для хранения матрицы вида
+    const viewMatrix = mat4.create();
 
     document.onkeydown = (ev) =>
-      keyDown({ ev, gl, n, u_ProjMatrix, projMatrix });
+      keyDown({ ev, gl, n, u_ViewMatrix, viewMatrix });
 
-    draw({ gl, u_ProjMatrix, n, projMatrix });
+    const u_ProjMatrix = gl.getUniformLocation(program, "u_ProjMatrix");
+    const projMatrix = mat4.create();
+    mat4.ortho(projMatrix, -1, 1, -1, 1, -1, 3);
+    gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix);
+
+    draw({ gl, u_ViewMatrix, n, viewMatrix });
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;
 });
 
-// Расстояние до ближней и дальней точки наблюдения
-let g_near = 0;
-let g_far = 0.5;
+// Точка наблюдения
+let g_eyeX = 0.2;
+const g_eyeY = 0.25;
+const g_eyeZ = 0.25;
 function keyDown({
   ev,
   gl,
   n,
-  u_ProjMatrix,
-  projMatrix,
+  u_ViewMatrix,
+  viewMatrix,
 }: {
   ev: KeyboardEvent;
   gl: WebGL2RenderingContext;
   n: number;
-  u_ProjMatrix: WebGLUniformLocation | null;
-  projMatrix: mat4;
+  u_ViewMatrix: WebGLUniformLocation | null;
+  viewMatrix: mat4;
 }) {
-  switch (ev.code) {
-    case "ArrowRight":
-      g_near += 0.01;
-      break;
-    case "ArrowLeft":
-      g_near -= 0.01;
-      break;
-    case "ArrowUp":
-      g_far += 0.01;
-      break;
-    case "ArrowDown":
-      g_far -= 0.01;
-      break;
+  if (ev.code === "ArrowRight") {
+    g_eyeX += 0.01;
+  } else if (ev.code === "ArrowLeft") {
+    g_eyeX -= 0.01;
+  } else {
+    return;
   }
-
-  draw({ gl, u_ProjMatrix, n, projMatrix });
+  draw({ gl, u_ViewMatrix, n, viewMatrix });
 }
 
 function draw({
   gl,
-  u_ProjMatrix,
+  u_ViewMatrix,
   n,
-  projMatrix,
+  viewMatrix,
 }: {
   gl: WebGL2RenderingContext;
-  u_ProjMatrix: WebGLUniformLocation | null;
+  u_ViewMatrix: WebGLUniformLocation | null;
+  viewMatrix: mat4;
   n: number;
-  projMatrix: mat4;
 }) {
-  // Установить видимый объём, используя матрицу
-  // mat4.ortho(projMatrix, -1, 1, -1, 1, g_near, g_far);
-  // mat4.ortho(projMatrix, -0.5, 0.5, -0.5, 0.5, 0, 0.5);
-  mat4.ortho(projMatrix, -0.3, 0.3, -1, 1, 0, 0.5);
+  // Точка наблюдения
+  const eyePoint = vec3.fromValues(g_eyeX, g_eyeY, g_eyeZ);
+  // Точка направления взгляда
+  const centerPoint = vec3.fromValues(0, 0, 0);
+  // Направление вверх
+  const upDirection = vec3.fromValues(0, 1, 0);
+  mat4.lookAt(viewMatrix, eyePoint, centerPoint, upDirection);
 
-  console.log({ g_near, g_far });
+  // Матрицами модели называются матрицы перемещения и/или вращения
+  const modelMatrix = mat4.create();
+  const ANGLE = -10;
+  const radian = (Math.PI * ANGLE) / 180; // Преобразование в радианы
+  mat4.fromZRotation(modelMatrix, radian);
 
-  // Передать матрицу вида в переменную u_ProjMatrix
-  gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix);
+  // Матрица модели вида - лучше вычислять в JS, а не в вершинном шейдере для каждой вершины (оптимизация)
+  const modelViewMatrix = mat4.create();
+  mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
+
+  // Передать матрицу вида в переменную u_ViewMatrix
+  gl.uniformMatrix4fv(u_ViewMatrix, false, modelViewMatrix);
 
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLES, 0, n);
