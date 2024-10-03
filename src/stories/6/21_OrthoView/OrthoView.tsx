@@ -14,7 +14,7 @@ export const OrthoView = memo(() => {
     const context = createWebGL2Context(ref.current);
     if (!context) return;
     const { gl } = context;
-    setBackgroundColor(gl);
+    setBackgroundColor({ gl, depthTest: true });
 
     const shaders = createShaders({ gl, vertexSource, fragmentSource });
     if (!shaders) return;

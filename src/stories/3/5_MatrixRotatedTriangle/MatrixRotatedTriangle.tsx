@@ -13,7 +13,7 @@ export const MatrixRotatedTriangle = memo(() => {
     const context = createWebGL2Context(ref.current);
     if (!context) return;
     const { gl } = context;
-    setBackgroundColor(gl);
+    setBackgroundColor({ gl });
 
     const shaders = createShaders({ gl, vertexSource, fragmentSource });
     if (!shaders) return;

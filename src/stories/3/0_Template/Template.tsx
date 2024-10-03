@@ -14,7 +14,7 @@ export const Template = memo(() => {
     const context = createWebGL2Context(ref.current);
     if (!context) return;
     const { gl, canvas } = context;
-    setBackgroundColor(gl);
+    setBackgroundColor({ gl });
 
     const shaders = createShaders({ gl, vertexSource, fragmentSource });
     if (!shaders) return;

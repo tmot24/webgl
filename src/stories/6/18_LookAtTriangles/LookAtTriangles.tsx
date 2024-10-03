@@ -14,7 +14,7 @@ export const LookAtTriangles = memo(() => {
     const context = createWebGL2Context(ref.current);
     if (!context) return;
     const { gl } = context;
-    setBackgroundColor(gl);
+    setBackgroundColor({ gl });
 
     const shaders = createShaders({ gl, vertexSource, fragmentSource });
     if (!shaders) return;
@@ -36,8 +36,7 @@ export const LookAtTriangles = memo(() => {
 
       0, 0.5, 0, 0.4, 0.4, 1, // ближний синий треугольник
       -0.5, -0.5, 0, 0.4, 0.4, 1,
-      0.5, -0.5, 0, 1, 0.4, 0.4
-
+      0.5, -0.5, 0, 1, 0.4, 0.4,
     ]);
     const FSIZE = verticesColors.BYTES_PER_ELEMENT;
     const dimension = 3;

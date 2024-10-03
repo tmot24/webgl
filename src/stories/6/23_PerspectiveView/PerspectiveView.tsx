@@ -14,7 +14,7 @@ export const PerspectiveView = memo(() => {
     const context = createWebGL2Context(ref.current);
     if (!context) return;
     const { gl, canvas } = context;
-    setBackgroundColor(gl);
+    setBackgroundColor({ gl });
 
     const shaders = createShaders({ gl, vertexSource, fragmentSource });
     if (!shaders) return;
@@ -114,7 +114,7 @@ export const PerspectiveView = memo(() => {
       projectionMatrix,
       radian,
       canvas.width / canvas.height,
-      0,
+      1,
       100,
     );
 
