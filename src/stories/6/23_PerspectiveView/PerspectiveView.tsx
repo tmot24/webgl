@@ -7,13 +7,13 @@ import { createProgram } from "../../../common/createProgram.ts";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { vec3, mat4 } from "gl-matrix";
 
-export const LookAtRotatedTrianglesWithKeysViewVolume = memo(() => {
+export const PerspectiveView = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const context = createWebGL2Context(ref.current);
     if (!context) return;
-    const { gl } = context;
+    const { gl, canvas } = context;
     setBackgroundColor(gl);
 
     const shaders = createShaders({ gl, vertexSource, fragmentSource });
@@ -25,24 +25,37 @@ export const LookAtRotatedTrianglesWithKeysViewVolume = memo(() => {
 
     // prettier-ignore
     const verticesColors = new Float32Array([
-      // координаты вершин и цвет
-      0, 0.5, -0.4, 0.4, 1, 0.4, // дальний зелёный треугольник
-      -0.5, -0.5, -0.4, 0.4, 1, 0.4,
-      0.5, -0.5, -0.4, 1, 0.4, 0.4,
+      // Three triangles on the right side
+      0.75,  1.0,  -4.0,  0.4,  1.0,  0.4, // The back green one
+      0.25, -1.0,  -4.0,  0.4,  1.0,  0.4,
+      1.25, -1.0,  -4.0,  1.0,  0.4,  0.4,
 
-      0.5, 0.4, -0.2, 1, 0.4, 0.4, // жёлтый треугольник в середине
-      -0.5, 0.4, -0.2, 1, 1, 0.4,
-      0, -0.6, -0.2, 1, 1, 0.4,
+      0.75,  1.0,  -2.0,  1.0,  1.0,  0.4, // The middle yellow one
+      0.25, -1.0,  -2.0,  1.0,  1.0,  0.4,
+      1.25, -1.0,  -2.0,  1.0,  0.4,  0.4,
 
-      0, 0.5, 0, 0.4, 0.4, 1, // ближний синий треугольник
-      -0.5, -0.5, 0, 0.4, 0.4, 1,
-      0.5, -0.5, 0, 1, 0.4, 0.4
+      0.75,  1.0,   0.0,  0.4,  0.4,  1.0,  // The front blue one
+      0.25, -1.0,   0.0,  0.4,  0.4,  1.0,
+      1.25, -1.0,   0.0,  1.0,  0.4,  0.4,
 
+      // Three triangles on the left side
+      -0.75,  1.0,  -4.0,  0.4,  1.0,  0.4, // The back green one
+      -1.25, -1.0,  -4.0,  0.4,  1.0,  0.4,
+      -0.25, -1.0,  -4.0,  1.0,  0.4,  0.4,
+
+      -0.75,  1.0,  -2.0,  1.0,  1.0,  0.4, // The middle yellow one
+      -1.25, -1.0,  -2.0,  1.0,  1.0,  0.4,
+      -0.25, -1.0,  -2.0,  1.0,  0.4,  0.4,
+
+      -0.75,  1.0,   0.0,  0.4,  0.4,  1.0,  // The front blue one
+      -1.25, -1.0,   0.0,  0.4,  0.4,  1.0,
+      -0.25, -1.0,   0.0,  1.0,  0.4,  0.4,
     ]);
     const FSIZE = verticesColors.BYTES_PER_ELEMENT;
     const dimension = 3;
-    const n = 9;
+    const n = 18; // Three vertices per triangle * 6
     const coordsCount = 3;
+    // в одной строке 6 единиц данных
     const stride = FSIZE * 6;
     const offsetPosition = 0;
     const offsetColor = FSIZE * coordsCount;
@@ -85,79 +98,33 @@ export const LookAtRotatedTrianglesWithKeysViewVolume = memo(() => {
     // Создаём матрицу для хранения матрицы вида
     const viewMatrix = mat4.create();
 
-    document.onkeydown = (ev) =>
-      keyDown({ ev, gl, n, u_ViewMatrix, viewMatrix });
-
     const u_ProjMatrix = gl.getUniformLocation(program, "u_ProjMatrix");
     const projectionMatrix = mat4.create();
-    mat4.ortho(projectionMatrix, -1, 1, -1, 1, 0, 3);
+
+    // Точка наблюдения
+    const eyePoint = vec3.fromValues(0, 0, 5);
+    // Точка направления взгляда
+    const centerPoint = vec3.fromValues(0, 0, -100);
+    // Направление вверх
+    const upDirection = vec3.fromValues(0, 1, 0);
+
+    mat4.lookAt(viewMatrix, eyePoint, centerPoint, upDirection);
+    const radian = (Math.PI * 30) / 180; // Преобразование в радианы
+    mat4.perspective(
+      projectionMatrix,
+      radian,
+      canvas.width / canvas.height,
+      0,
+      100,
+    );
+
+    // Передать матрицу вида в переменную u_ViewMatrix
+    gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix);
     gl.uniformMatrix4fv(u_ProjMatrix, false, projectionMatrix);
 
-    draw({ gl, u_ViewMatrix, n, viewMatrix });
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, n);
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;
 });
-
-// Точка наблюдения
-let g_eyeX = 0.2;
-const g_eyeY = 0.25;
-const g_eyeZ = 0.25;
-function keyDown({
-  ev,
-  gl,
-  n,
-  u_ViewMatrix,
-  viewMatrix,
-}: {
-  ev: KeyboardEvent;
-  gl: WebGL2RenderingContext;
-  n: number;
-  u_ViewMatrix: WebGLUniformLocation | null;
-  viewMatrix: mat4;
-}) {
-  if (ev.code === "ArrowRight") {
-    g_eyeX += 0.01;
-  } else if (ev.code === "ArrowLeft") {
-    g_eyeX -= 0.01;
-  } else {
-    return;
-  }
-  draw({ gl, u_ViewMatrix, n, viewMatrix });
-}
-
-function draw({
-  gl,
-  u_ViewMatrix,
-  n,
-  viewMatrix,
-}: {
-  gl: WebGL2RenderingContext;
-  u_ViewMatrix: WebGLUniformLocation | null;
-  viewMatrix: mat4;
-  n: number;
-}) {
-  // Точка наблюдения
-  const eyePoint = vec3.fromValues(g_eyeX, g_eyeY, g_eyeZ);
-  // Точка направления взгляда
-  const centerPoint = vec3.fromValues(0, 0, 0);
-  // Направление вверх
-  const upDirection = vec3.fromValues(0, 1, 0);
-  mat4.lookAt(viewMatrix, eyePoint, centerPoint, upDirection);
-
-  // Матрицами модели называются матрицы перемещения и/или вращения
-  const modelMatrix = mat4.create();
-  const ANGLE = -10;
-  const radian = (Math.PI * ANGLE) / 180; // Преобразование в радианы
-  mat4.fromZRotation(modelMatrix, radian);
-
-  // Матрица модели вида - лучше вычислять в JS, а не в вершинном шейдере для каждой вершины (оптимизация)
-  const modelViewMatrix = mat4.create();
-  mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
-
-  // Передать матрицу вида в переменную u_ViewMatrix
-  gl.uniformMatrix4fv(u_ViewMatrix, false, modelViewMatrix);
-
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.drawArrays(gl.TRIANGLES, 0, n);
-}

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { LookAtRotatedTrianglesWithKeysViewVolume } from "./LookAtRotatedTrianglesWithKeysViewVolume.tsx";
+import { PerspectiveView } from "./PerspectiveView.tsx";
 
 const meta = {
-  title: "Chapter/6/22 LookAtRotatedTrianglesWithKeysViewVolume",
-  component: LookAtRotatedTrianglesWithKeysViewVolume,
+  title: "Chapter/6/23 PerspectiveView",
+  component: PerspectiveView,
   parameters: {
     layout: "centered",
   },
@@ -11,7 +11,7 @@ const meta = {
     isTemplate: { control: "boolean" },
   },
   args: { isTemplate: true },
-} satisfies Meta<typeof LookAtRotatedTrianglesWithKeysViewVolume>;
+} satisfies Meta<typeof PerspectiveView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
