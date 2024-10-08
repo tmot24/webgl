@@ -7,7 +7,7 @@ import { createProgram } from "../../../common/createProgram.ts";
 import { vec3, mat4 } from "gl-matrix";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 
-export const Cube = memo(() => {
+export const ColoredCube = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -32,72 +32,55 @@ export const Cube = memo(() => {
     //  |/      |/
     //  v2------v3
     // prettier-ignore
-    const verticesColors = new Float32Array([
-      // Координаты вершин и цвета
-      1.0, 1.0, 1.0, 1.0, 1.0, 1.0,  // v0 White
-      -1.0, 1.0, 1.0, 1.0, 0.0, 1.0,  // v1 Magenta
-      -1.0, -1.0, 1.0, 1.0, 0.0, 0.0,  // v2 Red
-      1.0, -1.0, 1.0, 1.0, 1.0, 0.0,  // v3 Yellow
-      1.0, -1.0, -1.0, 0.0, 1.0, 0.0,  // v4 Green
-      1.0, 1.0, -1.0, 0.0, 1.0, 1.0,  // v5 Cyan
-      -1.0, 1.0, -1.0, 0.0, 0.0, 1.0,  // v6 Blue
-      -1.0, -1.0, -1.0, 0.0, 0.0, 0.0   // v7 Black
+    const vertices = new Float32Array([   // Vertex coordinates
+      1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,    // v0-v1-v2-v3 front
+      1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,   1.0, 1.0,-1.0,    // v0-v3-v4-v5 right
+      1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0,    // v0-v5-v6-v1 up
+      -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,    // v1-v6-v7-v2 left
+      -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,   1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,    // v7-v4-v3-v2 down
+      1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0     // v4-v7-v6-v5 back
     ]);
     // prettier-ignore
-    const indices = new Uint8Array([ // Uint8Array - потому что это целые числа до 255
-      // Индексы вершин
-      0, 1, 2, 0, 2, 3,    // front
-      0, 3, 4, 0, 4, 5,    // right
-      0, 5, 6, 0, 6, 1,    // up
-      1, 6, 7, 1, 7, 2,    // left
-      7, 4, 3, 7, 3, 2,    // down
-      4, 7, 6, 4, 6, 5     // back
+    const colors = new Float32Array([     // Colors
+      1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  // v0-v1-v2-v3
+      0.0, 1.0, 0.0,  0.0, 1.0, 0.0,  0.0, 1.0, 0.0,  0.0, 1.0, 0.0,  // v0-v3-v4-v5
+      0.0, 0.0, 1.0,  0.0, 0.0, 1.0,  0.0, 0.0, 1.0,  0.0, 0.0, 1.0,  // v0-v5-v6-v1
+      1.0, 1.0, 0.0,  1.0, 1.0, 0.0,  1.0, 1.0, 0.0,  1.0, 1.0, 0.0,  // v1-v6-v7-v2
+      1.0, 0.0, 1.0,  1.0, 0.0, 1.0,  1.0, 0.0, 1.0,  1.0, 0.0, 1.0,  // v7-v4-v3-v2
+      0.0, 1.0, 1.0,  0.0, 1.0, 1.0,  0.0, 1.0, 1.0,  0.0, 1.0, 1.0   // v4-v7-v6-v5
     ]);
-    const FSIZE = verticesColors.BYTES_PER_ELEMENT;
+    // prettier-ignore
+    const indices = new Uint8Array([       // Indices of the vertices
+      0, 1, 2,   0, 2, 3,    // front
+      4, 5, 6,   4, 6, 7,    // right
+      8, 9,10,   8,10,11,    // up
+      12,13,14,  12,14,15,    // left
+      16,17,18,  16,18,19,    // down
+      20,21,22,  20,22,23     // back
+    ]);
     const dimension = 3;
     const n = indices.length;
-    const coordsCount = 3;
-    // в одной строке 6 единиц данных
-    const stride = FSIZE * 6;
-    const offsetPosition = 0;
-    const offsetColor = FSIZE * coordsCount;
 
-    // 1. Создать буферный объект
-    const vertexColorBuffer = gl.createBuffer();
-    // 1.5 Создаём индексный буферный объект
-    const indicesBuffer = gl.createBuffer();
-    // 2. Указать типы буферных объектов
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
-    // 3. Записать данные в буферные объекты
-    gl.bufferData(gl.ARRAY_BUFFER, verticesColors, gl.STATIC_DRAW);
+    initArrayBuffer({
+      gl,
+      data: vertices,
+      num: dimension,
+      program,
+      attribute: "a_Position",
+    });
+    initArrayBuffer({
+      gl,
+      data: colors,
+      num: dimension,
+      program,
+      attribute: "a_Color",
+    });
+    // 1. Создать буферный объект для индексов
+    const indexBuffer = gl.createBuffer();
+    // 2. Указываем тип буферного объекта
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    // 3. Запись данных в буферный объект
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-    const a_Position = gl.getAttribLocation(program, "a_Position");
-    // 4. Сохранить ссылку на буферный объект в переменной a_Position
-    gl.vertexAttribPointer(
-      a_Position,
-      dimension,
-      gl.FLOAT,
-      false,
-      stride,
-      offsetPosition,
-    );
-    // 5. Разрешить присваивание переменной a_Position
-    gl.enableVertexAttribArray(a_Position);
-
-    const a_Color = gl.getAttribLocation(program, "a_Color");
-    // 4. Сохранить ссылку на буферный объект в переменной a_Color
-    gl.vertexAttribPointer(
-      a_Color,
-      dimension,
-      gl.FLOAT,
-      false,
-      stride,
-      offsetColor,
-    );
-    // 5. Разрешить присваивание переменной a_Position
-    gl.enableVertexAttribArray(a_Color);
 
     const u_MvpMatrix = gl.getUniformLocation(program, "u_MvpMatrix");
     // Матрица модели вида проекции
@@ -142,3 +125,30 @@ export const Cube = memo(() => {
 
   return <canvas width={500} height={500} ref={ref} />;
 });
+
+function initArrayBuffer({
+  gl,
+  program,
+  data,
+  num,
+  attribute,
+}: {
+  gl: WebGL2RenderingContext;
+  program: WebGLProgram;
+  data: Float32Array;
+  num: number;
+  attribute: string;
+}) {
+  // 1. Создать буферный объект
+  const buffer = gl.createBuffer();
+  // 2. Указать типы буферных объектов
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  // 3. Записать данные в буферные объекты
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+  // Присвоить буферный объект переменной-атрибуту
+  const a_Attribute = gl.getAttribLocation(program, attribute);
+  // 4. Сохранить ссылку на буферный объект в переменной a_Position
+  gl.vertexAttribPointer(a_Attribute, num, gl.FLOAT, false, 0, 0);
+  // 5. Разрешить присваивание переменной a_Position
+  gl.enableVertexAttribArray(a_Attribute);
+}
