@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { OrthoView } from "./OrthoView.tsx";
+import { PerspectiveViewMVPMatrix } from "./PerspectiveViewMVPMatrix.tsx";
 
 const meta = {
-  title: "Chapter/6/21 OrthoView",
-  component: OrthoView,
+  title: "Chapter/7/25 PerspectiveViewMVPMatrix",
+  component: PerspectiveViewMVPMatrix,
   parameters: {
     layout: "centered",
   },
@@ -11,7 +11,7 @@ const meta = {
     isTemplate: { control: "boolean" },
   },
   args: { isTemplate: true },
-} satisfies Meta<typeof OrthoView>;
+} satisfies Meta<typeof PerspectiveViewMVPMatrix>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

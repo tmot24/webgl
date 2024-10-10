@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ColoredCube } from "./ColoredCube.tsx";
+import { PerspectiveView } from "./PerspectiveView.tsx";
 
 const meta = {
-  title: "Chapter/6/29 ColoredCube",
-  component: ColoredCube,
+  title: "Chapter/7/23 PerspectiveView",
+  component: PerspectiveView,
   parameters: {
     layout: "centered",
   },
@@ -11,7 +11,7 @@ const meta = {
     isTemplate: { control: "boolean" },
   },
   args: { isTemplate: true },
-} satisfies Meta<typeof ColoredCube>;
+} satisfies Meta<typeof PerspectiveView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

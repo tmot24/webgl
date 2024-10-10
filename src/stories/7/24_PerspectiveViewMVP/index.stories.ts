@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ZFighting } from "./ZFighting.tsx";
+import { PerspectiveViewMVP } from "./PerspectiveViewMVP.tsx";
 
 const meta = {
-  title: "Chapter/6/27 ZFighting",
-  component: ZFighting,
+  title: "Chapter/7/24 PerspectiveViewMVP",
+  component: PerspectiveViewMVP,
   parameters: {
     layout: "centered",
   },
@@ -11,7 +11,7 @@ const meta = {
     isTemplate: { control: "boolean" },
   },
   args: { isTemplate: true },
-} satisfies Meta<typeof ZFighting>;
+} satisfies Meta<typeof PerspectiveViewMVP>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { LookAtRotatedTrianglesWithKeys } from "./LookAtRotatedTrianglesWithKeys.tsx";
+import { Cube } from "./Cube.tsx";
 
 const meta = {
-  title: "Chapter/6/20 LookAtRotatedTrianglesWithKeys",
-  component: LookAtRotatedTrianglesWithKeys,
+  title: "Chapter/7/28 Cube",
+  component: Cube,
   parameters: {
     layout: "centered",
   },
@@ -11,7 +11,7 @@ const meta = {
     isTemplate: { control: "boolean" },
   },
   args: { isTemplate: true },
-} satisfies Meta<typeof LookAtRotatedTrianglesWithKeys>;
+} satisfies Meta<typeof Cube>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
