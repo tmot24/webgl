@@ -96,7 +96,22 @@ export const LookAtRotatedTriangles = memo(() => {
     const viewMatrix = mat4.create();
     mat4.lookAt(viewMatrix, eyePoint, centerPoint, upDirection);
 
-    // Матрицами модели называются матрицы перемещения и/или вращения
+    /*
+     Матрицами модели - это трансформации объектов из локального пространства (координаты объекта) в мировое пространство.
+     Она объединяет: трансляцию, вращение и масштабирование.
+     | m00 m01 m02 m03 |
+     | m10 m11 m12 m13 |
+     | m20 m21 m22 m23 |
+     | m30 m31 m32 m33 |
+     Трансляция:
+     m03: перемещение по X.
+     m13: перемещение по Y.
+     m23: перемещение по Z.
+     Масштабирование:
+     m00, m11, m22: определяют масштаб объекта по соответствующим осям.
+     Вращение:
+     Остальные элементы матрицы управляют вращением и искажением объекта.
+    */
     const modelMatrix = mat4.create();
     const ANGLE = -10;
     const radian = (Math.PI * ANGLE) / 180; // Преобразование в радианы
@@ -105,6 +120,8 @@ export const LookAtRotatedTriangles = memo(() => {
     // Матрица модели вида - лучше вычислять в JS, а не в вершинном шейдере для каждой вершины (оптимизация)
     const modelViewMatrix = mat4.create();
     mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
+
+    console.log("viewMatrix", viewMatrix);
 
     // Передать матрицу вида в переменную u_ModelViewMatrix
     gl.uniformMatrix4fv(u_ModelViewMatrix, false, modelViewMatrix);

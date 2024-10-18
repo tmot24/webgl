@@ -99,8 +99,6 @@ export const PerspectiveView = memo(() => {
     const viewMatrix = mat4.create();
 
     const u_ProjMatrix = gl.getUniformLocation(program, "u_ProjMatrix");
-    const projectionMatrix = mat4.create();
-
     // Точка наблюдения
     const eyePoint = vec3.fromValues(0, 0, 5);
     // Точка направления взгляда
@@ -110,6 +108,17 @@ export const PerspectiveView = memo(() => {
 
     mat4.lookAt(viewMatrix, eyePoint, centerPoint, upDirection);
     const radian = (Math.PI * 30) / 180; // Преобразование в радианы
+    // Матрица перспективной проекции - моделирует, как объекты выглядят меньшими по мере удаления от наблюдателя,
+    // что делает сцену более реалистичной.
+    // |  f/aspect  0        0                       0          |
+    // |  0         f        0                       0          |
+    // |  0         0        (far+near)/(near-far)  (2*far*near)/(near-far) |
+    // |  0         0       -1                       0          |
+    // Где:
+    // f — величина, связанная с полем зрения,
+    // aspect — соотношение сторон,
+    // near и far — расстояния до ближайшей и дальней плоскости отсечения.
+    const projectionMatrix = mat4.create();
     mat4.perspective(
       projectionMatrix,
       radian,
@@ -117,6 +126,8 @@ export const PerspectiveView = memo(() => {
       1,
       100,
     );
+
+    console.log("projectionMatrix", projectionMatrix);
 
     // Передать матрицу вида в переменную u_ViewMatrix
     gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix);

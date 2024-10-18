@@ -81,13 +81,26 @@ export const OrthoView = memo(() => {
     gl.enableVertexAttribArray(a_Color);
 
     const u_ProjMatrix = gl.getUniformLocation(program, "u_ProjMatrix");
-    // Матрица для установки точки взгляда и линии взгляда.
-    const projectionMatrix = mat4.create();
+    /*
+     Матрица ортографической проекции - сохраняет размеры объектов независимо от их расстояния до камеры
+     | 2/(r-l)       0             0             0  |
+     | 0             2/(t-b)       0             0  |
+     | 0             0             -2/(f-n)      0  |
+     | -(r+l)/(r-l)  -(t+b)/(t-b)  -(f+n)/(f-n)  1  |
+     Где:
+     l: Левая граница видимого объема
+     r: Правая граница видимого объема
+     b: Нижняя граница видимого объема
+     t: Верхняя граница видимого объема
+     n: Ближняя плоскость отсечения
+     f: Дальняя плоскость отсечения
+    */
+    const orthoProjectionMatrix = mat4.create();
 
     document.onkeydown = (ev) =>
-      keyDown({ ev, gl, n, u_ProjMatrix, projectionMatrix });
+      keyDown({ ev, gl, n, u_ProjMatrix, orthoProjectionMatrix });
 
-    draw({ gl, u_ProjMatrix, n, projectionMatrix });
+    draw({ gl, u_ProjMatrix, n, orthoProjectionMatrix });
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;
@@ -101,13 +114,13 @@ function keyDown({
   gl,
   n,
   u_ProjMatrix,
-  projectionMatrix,
+  orthoProjectionMatrix,
 }: {
   ev: KeyboardEvent;
   gl: WebGL2RenderingContext;
   n: number;
   u_ProjMatrix: WebGLUniformLocation | null;
-  projectionMatrix: mat4;
+  orthoProjectionMatrix: mat4;
 }) {
   switch (ev.code) {
     case "ArrowRight":
@@ -124,29 +137,29 @@ function keyDown({
       break;
   }
 
-  draw({ gl, u_ProjMatrix, n, projectionMatrix });
+  draw({ gl, u_ProjMatrix, n, orthoProjectionMatrix });
 }
 
 function draw({
   gl,
   u_ProjMatrix,
   n,
-  projectionMatrix,
+  orthoProjectionMatrix,
 }: {
   gl: WebGL2RenderingContext;
   u_ProjMatrix: WebGLUniformLocation | null;
   n: number;
-  projectionMatrix: mat4;
+  orthoProjectionMatrix: mat4;
 }) {
   // Установить видимый объём, используя матрицу
-  mat4.ortho(projectionMatrix, -1, 1, -1, 1, g_near, g_far);
-  // mat4.ortho(projectionMatrix, -0.5, 0.5, -0.5, 0.5, 0, 0.5);
-  // mat4.ortho(projectionMatrix, -0.3, 0.3, -1, 1, 0, 0.5);
+  mat4.ortho(orthoProjectionMatrix, -1, 1, -1, 1, g_near, g_far);
+  // mat4.ortho(orthoProjectionMatrix, -0.5, 0.5, -0.5, 0.5, 0, 0.5);
+  // mat4.ortho(orthoProjectionMatrix, -0.3, 0.3, -1, 1, 0, 0.5);
 
   console.log({ g_near, g_far });
 
   // Передать матрицу вида в переменную u_ProjMatrix
-  gl.uniformMatrix4fv(u_ProjMatrix, false, projectionMatrix);
+  gl.uniformMatrix4fv(u_ProjMatrix, false, orthoProjectionMatrix);
 
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLES, 0, n);
