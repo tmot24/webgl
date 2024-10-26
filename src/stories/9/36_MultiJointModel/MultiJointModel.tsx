@@ -4,11 +4,11 @@ import fragmentSource from "./shaders/fragment.frag?raw";
 import { createWebGL2Context } from "../../../common/createWebGL2Context.ts";
 import { createShaders } from "../../../common/createShaders.ts";
 import { createProgram } from "../../../common/createProgram.ts";
-import { mat4, quat, vec3 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
 
-export const JointModel = memo(() => {
+export const MultiJointModel = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -87,12 +87,12 @@ function initVertexBuffers({
   // Координаты вершины (кубоид шириной 3,0, высотой 10,0 и длиной 3,0 с началом координат в центре основания)
   // prettier-ignore
   const vertices = new Float32Array([
-    1.5, 10.0, 1.5, -1.5, 10.0, 1.5, -1.5, 0.0, 1.5, 1.5, 0.0, 1.5, // v0-v1-v2-v3 front
-    1.5, 10.0, 1.5, 1.5, 0.0, 1.5, 1.5, 0.0, -1.5, 1.5, 10.0, -1.5, // v0-v3-v4-v5 right
-    1.5, 10.0, 1.5, 1.5, 10.0, -1.5, -1.5, 10.0, -1.5, -1.5, 10.0, 1.5, // v0-v5-v6-v1 up
-    -1.5, 10.0, 1.5, -1.5, 10.0, -1.5, -1.5, 0.0, -1.5, -1.5, 0.0, 1.5, // v1-v6-v7-v2 left
-    -1.5, 0.0, -1.5, 1.5, 0.0, -1.5, 1.5, 0.0, 1.5, -1.5, 0.0, 1.5, // v7-v4-v3-v2 down
-    1.5, 0.0, -1.5, -1.5, 0.0, -1.5, -1.5, 10.0, -1.5, 1.5, 10.0, -1.5  // v4-v7-v6-v5 back
+    0.5, 1.0, 0.5, -0.5, 1.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, 0.5, // v0-v1-v2-v3 front
+    0.5, 1.0, 0.5, 0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 1.0, -0.5, // v0-v3-v4-v5 right
+    0.5, 1.0, 0.5, 0.5, 1.0, -0.5, -0.5, 1.0, -0.5, -0.5, 1.0, 0.5, // v0-v5-v6-v1 up
+    -0.5, 1.0, 0.5, -0.5, 1.0, -0.5, -0.5, 0.0, -0.5, -0.5, 0.0, 0.5, // v1-v6-v7-v2 left
+    -0.5, 0.0, -0.5, 0.5, 0.0, -0.5, 0.5, 0.0, 0.5, -0.5, 0.0, 0.5, // v7-v4-v3-v2 down
+    0.5, 0.0, -0.5, -0.5, 0.0, -0.5, -0.5, 1.0, -0.5, 0.5, 1.0, -0.5  // v4-v7-v6-v5 back
   ]);
 
   // Нормали
@@ -169,8 +169,10 @@ function initArrayBuffer({
 }
 
 const ANGLE_STEP = 3.0; // Шаг изменения угла поворота (градусы)
-let g_arm1Angle = -90.0; // Угол поворота сегмента1 (градусы)
-let g_joint1Angle = -45.0; // Угол поворота сочленения1 (градусы)
+let g_arm1Angle = 90.0; // Угол поворота сегмента1 (градусы)
+let g_joint1Angle = 45.0; // Угол поворота сочленения1 (градусы)
+let g_joint2Angle = 0.0; // Угол поворота сочленения2 (градусы)
+let g_joint3Angle = 0.0; // Угол поворота сочленения3 (градусы)
 
 function keydownHandler({
   ev,
@@ -201,6 +203,22 @@ function keydownHandler({
       break;
     case "ArrowLeft": // Уменьшение угла поворота сегмента1 (ось Y)
       g_arm1Angle = (g_arm1Angle - ANGLE_STEP) % 360;
+      break;
+    case "KeyZ": // Увеличение угла поворота сочленения2
+      g_joint2Angle = (g_joint2Angle + ANGLE_STEP) % 360;
+      break;
+    case "KeyX": // Уменьшение угла поворота сочленения2
+      g_joint2Angle = (g_joint2Angle - ANGLE_STEP) % 360;
+      break;
+    case "KeyC": // Увеличение угла поворота сочленения3
+      if (g_joint3Angle < 60) {
+        g_joint3Angle = (g_joint3Angle + ANGLE_STEP) % 360;
+      }
+      break;
+    case "KeyV": // Уменьшение угла поворота сочленения3
+      if (g_joint3Angle > -60) {
+        g_joint3Angle = (g_joint3Angle - ANGLE_STEP) % 360;
+      }
       break;
     default:
       return;
@@ -234,20 +252,34 @@ function draw({
   // Очистить буферы цвета и глубины
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Сегмент 1
+  // Нарисовать станину (платформу)
+  const baseHeight = 2;
+  const platform = mat4.create();
+  mat4.fromTranslation(platform, vec3.fromValues(0, -12, 0));
+  const platformScale = mat4.create();
+  mat4.scale(platformScale, platform, vec3.fromValues(10, baseHeight, 10));
+  drawBox({
+    gl,
+    n,
+    modelMatrix: platformScale,
+    viewProjMatrix,
+    mvpMatrix,
+    u_MvpMatrix,
+    u_NormalMatrix,
+  });
+
+  // Плечо
   const arm1Length = 10; // Длина сегмента 1
-  const segment1 = mat4.create();
-  mat4.fromRotationTranslation(
-    segment1,
-    // Поворот
-    quat.setAxisAngle(
-      quat.create(),
-      [0, 1, 0],
-      getRadianFromDegree(g_arm1Angle),
-    ),
-    // перемещение
-    vec3.fromValues(0, -12, 0),
-  );
+  const { modelMatrix: segment1, parentTranslationRotation: parent1 } =
+    getMatrix({
+      angle: g_arm1Angle,
+      axis: vec3.fromValues(0, 1, 0),
+      parentHeight: baseHeight,
+      width: 3,
+      height: arm1Length,
+      depth: 3,
+      parentMatrix: platform,
+    });
 
   drawBox({
     gl,
@@ -259,31 +291,90 @@ function draw({
     u_NormalMatrix,
   });
 
-  // Сегмент 2
-  const segment2 = mat4.create();
-  mat4.fromRotationTranslationScale(
-    segment2,
-    // Поворот
-    quat.setAxisAngle(
-      quat.create(),
-      [0, 0, 1],
-      getRadianFromDegree(g_joint1Angle),
-    ),
-    // перемещение
-    vec3.fromValues(0, arm1Length, 0), // по какой-то причине мы перемещаем на vec3.fromValues(0, arm1Length, 0)
-    // сделать чуть тоньше;
-    vec3.fromValues(1.3, 1, 1.3),
-  );
-
-  // Важно!
-  // Необходимо перемножить матрицы, для того чтобы начать рисовать сегмент 2 с места,
-  // где закончил рисоваться сегмент 1
-  mat4.multiply(segment2, segment1, segment2);
+  // Предплечье
+  const arm2Length = 10;
+  const { modelMatrix: segment2, parentTranslationRotation: patent2 } =
+    getMatrix({
+      angle: g_joint1Angle,
+      axis: vec3.fromValues(0, 0, 1),
+      parentHeight: arm1Length,
+      width: 4,
+      height: arm2Length,
+      depth: 4,
+      parentMatrix: parent1,
+    });
 
   drawBox({
     gl,
     n,
     modelMatrix: segment2,
+    viewProjMatrix,
+    mvpMatrix,
+    u_MvpMatrix,
+    u_NormalMatrix,
+  });
+
+  // Кисть
+  const palmLength = 2;
+  const { modelMatrix: palm, parentTranslationRotation: parentPalm } =
+    getMatrix({
+      angle: g_joint2Angle,
+      axis: vec3.fromValues(0, 1, 0),
+      parentHeight: arm2Length,
+      width: 2,
+      height: palmLength,
+      depth: 6,
+      parentMatrix: patent2,
+    });
+
+  drawBox({
+    gl,
+    n,
+    modelMatrix: palm,
+    viewProjMatrix,
+    mvpMatrix,
+    u_MvpMatrix,
+    u_NormalMatrix,
+  });
+
+  // Первый палец
+  const { modelMatrix: finger1 } = getMatrix({
+    angle: g_joint3Angle,
+    axis: vec3.fromValues(1, 0, 0),
+    parentHeight: palmLength,
+    ownZ: 2,
+    width: 1,
+    height: palmLength,
+    depth: 1,
+    parentMatrix: parentPalm,
+  });
+
+  drawBox({
+    gl,
+    n,
+    modelMatrix: finger1,
+    viewProjMatrix,
+    mvpMatrix,
+    u_MvpMatrix,
+    u_NormalMatrix,
+  });
+
+  // Второй палец
+  const { modelMatrix: finger2 } = getMatrix({
+    angle: -g_joint3Angle,
+    axis: vec3.fromValues(1, 0, 0),
+    parentHeight: palmLength,
+    ownZ: -2,
+    width: 1,
+    height: palmLength,
+    depth: 1,
+    parentMatrix: parentPalm,
+  });
+
+  drawBox({
+    gl,
+    n,
+    modelMatrix: finger2,
     viewProjMatrix,
     mvpMatrix,
     u_MvpMatrix,
@@ -320,4 +411,52 @@ function drawBox({
   gl.uniformMatrix4fv(u_NormalMatrix, true, g_normalMatrix);
   // Нарисовать
   gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+}
+
+function getMatrix({
+  angle,
+  axis,
+  parentHeight,
+  ownZ = 0,
+  width,
+  height,
+  depth,
+  parentMatrix,
+}: {
+  angle: number;
+  axis: vec3;
+  parentHeight: number;
+  ownZ?: number;
+  width: number;
+  height: number;
+  depth: number;
+  parentMatrix: mat4;
+}) {
+  // Перемещение
+  const translation = mat4.create();
+  mat4.fromTranslation(translation, vec3.fromValues(0, parentHeight, ownZ));
+  // Поворот
+  const rotation = mat4.create();
+  mat4.fromRotation(rotation, getRadianFromDegree(angle), axis);
+  const translationRotation = mat4.create();
+  mat4.multiply(translationRotation, translation, rotation);
+  // Увеличение
+  const scale = mat4.create();
+  mat4.scale(scale, scale, vec3.fromValues(width, height, depth));
+  const translationRotationScale = mat4.create();
+  mat4.multiply(translationRotationScale, translationRotation, scale);
+
+  // Матрица модели с родителем
+  const parentTranslationRotation = mat4.create();
+  mat4.multiply(parentTranslationRotation, parentMatrix, translationRotation);
+
+  // Важно!
+  // Необходимо перемножить матрицы, для того чтобы начать рисовать сегмент 1 с платформы
+  const modelMatrix = mat4.create();
+  mat4.multiply(modelMatrix, parentMatrix, translationRotationScale);
+
+  return {
+    parentTranslationRotation,
+    modelMatrix,
+  };
 }
