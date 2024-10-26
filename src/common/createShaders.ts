@@ -8,13 +8,15 @@ export const createShaders = ({
   vertexSource: string;
   fragmentSource: string;
 }) => {
+  // 1. Создание объекта шейдеров
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
   if (!vertexShader || !fragmentShader) return;
 
+  // 2. Привязать шейдеры
   gl.shaderSource(vertexShader, vertexSource);
   gl.shaderSource(fragmentShader, fragmentSource);
-
+  // 3. Компиляция шейдеров
   gl.compileShader(vertexShader);
   gl.compileShader(fragmentShader);
 

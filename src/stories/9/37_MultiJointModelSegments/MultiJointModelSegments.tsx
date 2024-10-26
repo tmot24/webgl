@@ -74,6 +74,10 @@ export const MultiJointModelSegments = memo(() => {
       u_MvpMatrix,
       u_NormalMatrix,
     });
+
+    return () => {
+      gl.deleteProgram(program);
+    };
   }, []);
 
   return <canvas width={500} height={500} ref={ref} />;
