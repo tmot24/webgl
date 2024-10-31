@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { HUD } from "./HUD.tsx";
+import { DoverWeb } from "./DoverWeb.tsx";
 
 const meta = {
-  title: "Chapter/10/41 HUD",
-  component: HUD,
+  title: "Chapter/10/42 DoverWeb",
+  component: DoverWeb,
   parameters: {
     layout: "centered",
   },
@@ -11,7 +11,7 @@ const meta = {
     isTemplate: { control: "boolean" },
   },
   args: { isTemplate: true },
-} satisfies Meta<typeof HUD>;
+} satisfies Meta<typeof DoverWeb>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
