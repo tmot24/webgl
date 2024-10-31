@@ -3,12 +3,14 @@ export function initArrayBuffer({
   program,
   data,
   num,
+  type = gl.FLOAT,
   attribute,
 }: {
   gl: WebGL2RenderingContext;
   program: WebGLProgram;
-  data: Float32Array;
+  data: Float32Array | Uint8Array;
   num: number;
+  type?: number;
   attribute: string;
 }) {
   // 1. Создать буферный объект
@@ -20,7 +22,7 @@ export function initArrayBuffer({
   // Присвоить буферный объект переменной-атрибуту
   const a_Attribute = gl.getAttribLocation(program, attribute);
   // 4. Сохранить ссылку на буферный объект в переменной a_Attribute
-  gl.vertexAttribPointer(a_Attribute, num, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(a_Attribute, num, type, false, 0, 0);
   // 5. Разрешить присваивание переменной a_Attribute
   gl.enableVertexAttribArray(a_Attribute);
 
