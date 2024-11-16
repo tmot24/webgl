@@ -127,8 +127,6 @@ export const PerspectiveView = memo(() => {
       100,
     );
 
-    console.log("projectionMatrix", projectionMatrix);
-
     // Передать матрицу вида в переменную u_ViewMatrix
     gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix);
     gl.uniformMatrix4fv(u_ProjMatrix, false, projectionMatrix);

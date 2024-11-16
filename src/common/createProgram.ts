@@ -18,8 +18,9 @@ export const createProgram = ({
   gl.linkProgram(program);
 
   const programCompiled = gl.getProgramParameter(program, gl.LINK_STATUS);
+
   if (!programCompiled) {
-    const error = gl.getProgramInfoLog(vertexShader);
+    const error = gl.getProgramInfoLog(program);
     console.error(`Ошибка компоновки программы: ${error}`);
     gl.deleteProgram(program);
 

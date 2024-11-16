@@ -75,8 +75,6 @@ export const PointLightedCube = memo(() => {
     // Передать матрицу проекции вида модели в u_MvpMatrix
     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix);
 
-    console.log("mvpMatrix", mvpMatrix);
-
     // Вычислить матрицу для преобразования нормали на основе матрицы модели
     mat4.invert(normalMatrix, modelMatrix);
     // Передать матрицу преобразования для нормалей в u_NormalMatrix (необходимо транспонировать)

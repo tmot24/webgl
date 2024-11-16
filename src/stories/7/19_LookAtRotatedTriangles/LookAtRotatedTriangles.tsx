@@ -121,8 +121,6 @@ export const LookAtRotatedTriangles = memo(() => {
     const modelViewMatrix = mat4.create();
     mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
 
-    console.log("viewMatrix", viewMatrix);
-
     // Передать матрицу вида в переменную u_ModelViewMatrix
     gl.uniformMatrix4fv(u_ModelViewMatrix, false, modelViewMatrix);
 
