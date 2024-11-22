@@ -1,8 +1,8 @@
 export class InitArrayBuffer {
-  gl: WebGL2RenderingContext;
-  buffer: WebGLBuffer | null;
-  num: number;
-  type: number;
+  private readonly gl: WebGL2RenderingContext;
+  private readonly num: number;
+  private readonly type: number;
+  readonly buffer: WebGLBuffer | null;
 
   constructor({
     gl,

@@ -305,5 +305,5 @@ function drawCube({
     matrix4: mvpMatrix,
   };
 
-  gl.drawElements(gl.TRIANGLES, index.count, gl.UNSIGNED_BYTE, 0);
+  gl.drawElements(gl.TRIANGLES, index.count, index.type, 0);
 }

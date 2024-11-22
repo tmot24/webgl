@@ -1,7 +1,7 @@
 export class InitTexture {
-  gl: WebGL2RenderingContext;
-  texture: WebGLTexture;
-  textureSlot: GLenum;
+  private readonly gl: WebGL2RenderingContext;
+  private readonly texture: WebGLTexture;
+  private readonly textureSlot: GLenum;
 
   constructor({
     gl,

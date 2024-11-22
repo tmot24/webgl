@@ -1,9 +1,9 @@
 // Для индексов
 export class InitElementArrayBuffer {
-  gl: WebGL2RenderingContext;
-  buffer: WebGLBuffer | null;
-  count: GLsizei;
-  type: number;
+  private readonly gl: WebGL2RenderingContext;
+  readonly type: number;
+  readonly count: GLsizei;
+  readonly buffer: WebGLBuffer | null;
 
   constructor({
     gl,

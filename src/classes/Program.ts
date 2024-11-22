@@ -4,7 +4,7 @@ export class Program {
   private readonly vertexShader: WebGLShader;
   private readonly fragmentShader: WebGLShader;
   private readonly gl: WebGL2RenderingContext;
-  program: WebGLProgram;
+  readonly program: WebGLProgram;
 
   constructor({
     gl,
