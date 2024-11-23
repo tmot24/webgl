@@ -8,6 +8,7 @@ import { mat4, vec3 } from "gl-matrix";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
 import { initArrayBuffer } from "../../../common/initArrayBuffer.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const HUD = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -166,6 +167,7 @@ export const HUD = memo(() => {
         height={500}
         ref={hudRef}
       />
+      <Fps />
     </div>
   );
 });

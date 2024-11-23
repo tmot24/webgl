@@ -9,6 +9,7 @@ import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
 import { initArrayBuffer } from "../../../common/initArrayBuffer.ts";
 import sky from "../../../resources/sky.jpg";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const RotatedObject = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -88,7 +89,12 @@ export const RotatedObject = memo(() => {
     };
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 function initVertexBuffers({

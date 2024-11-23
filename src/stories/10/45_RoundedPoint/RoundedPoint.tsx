@@ -6,6 +6,7 @@ import { createShaders } from "../../../common/createShaders.ts";
 import { createProgram } from "../../../common/createProgram.ts";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { get2dCoordinates } from "../../../common/get2dCoordinates.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const RoundedPoint = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -34,7 +35,12 @@ export const RoundedPoint = memo(() => {
     gl.vertexAttrib1f(a_PointSize, 10);
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 const g_points: [number, number][] = [];

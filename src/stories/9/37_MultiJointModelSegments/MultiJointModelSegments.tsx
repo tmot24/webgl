@@ -7,6 +7,7 @@ import { createProgram } from "../../../common/createProgram.ts";
 import { mat4, vec3 } from "gl-matrix";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const MultiJointModelSegments = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -80,7 +81,12 @@ export const MultiJointModelSegments = memo(() => {
     };
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 const ANGLE_STEP = 3.0; // Шаг изменения угла поворота (градусы)

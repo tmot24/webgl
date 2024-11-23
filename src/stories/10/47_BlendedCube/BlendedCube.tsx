@@ -6,6 +6,7 @@ import { createShaders } from "../../../common/createShaders.ts";
 import { createProgram } from "../../../common/createProgram.ts";
 import { vec3, mat4 } from "gl-matrix";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const BlendedCube = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -127,7 +128,12 @@ export const BlendedCube = memo(() => {
     gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 function initArrayBuffer({

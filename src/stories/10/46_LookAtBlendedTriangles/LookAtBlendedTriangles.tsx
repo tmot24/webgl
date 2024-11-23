@@ -6,6 +6,7 @@ import { createShaders } from "../../../common/createShaders.ts";
 import { createProgram } from "../../../common/createProgram.ts";
 import { setBackgroundColor } from "../../../common/setBackgroundColor.ts";
 import { vec3, mat4 } from "gl-matrix";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const LookAtBlendedTriangles = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -106,7 +107,12 @@ export const LookAtBlendedTriangles = memo(() => {
     draw({ gl, u_ViewMatrix, n, viewMatrix });
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 // Точка наблюдения

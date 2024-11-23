@@ -7,6 +7,7 @@ import { createProgram } from "../../../common/createProgram.ts";
 import { mat4, vec3 } from "gl-matrix";
 import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
 import { initArrayBuffer } from "../../../common/initArrayBuffer.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const DoverWeb = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -176,6 +177,7 @@ export const DoverWeb = memo(() => {
         height={500}
         ref={ref}
       />
+      <Fps />
     </div>
   );
 });

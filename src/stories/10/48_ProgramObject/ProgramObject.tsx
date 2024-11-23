@@ -12,6 +12,7 @@ import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
 import orange from "../../../resources/orange.jpg";
 import { initArrayBufferForLaterUse } from "../../../common/initArrayBufferForLaterUse.ts";
 import { getAnimateAngle } from "../../../common/getAnimateAngle.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const ProgramObject = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -176,7 +177,12 @@ export const ProgramObject = memo(() => {
     };
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 function initVertexBuffers({ gl }: { gl: WebGL2RenderingContext }) {

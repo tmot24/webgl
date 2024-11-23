@@ -21,6 +21,7 @@ import {
 } from "./data.ts";
 import { InitTexture } from "../../../classes/InitTexture.ts";
 import { InitFramebufferTexture } from "../../../classes/InitFramebufferTexture.ts";
+import { Fps } from "../../../fps/Fps.tsx";
 
 export const FramebufferObject = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -177,7 +178,12 @@ export const FramebufferObject = memo(() => {
     };
   }, []);
 
-  return <canvas width={500} height={500} ref={ref} />;
+  return (
+    <>
+      <canvas width={500} height={500} ref={ref} />
+      <Fps />
+    </>
+  );
 });
 
 function draw({
