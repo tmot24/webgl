@@ -1,9 +1,11 @@
 import { mat4 } from "gl-matrix";
+import { Deletable } from "./interface/Deletable.ts";
 
-export class Program {
+export class Program implements Deletable {
   private readonly vertexShader: WebGLShader;
   private readonly fragmentShader: WebGLShader;
   private readonly gl: WebGL2RenderingContext;
+  private uniformLocations: Map<string, WebGLUniformLocation> = new Map();
   readonly program: WebGLProgram;
 
   constructor({
@@ -80,7 +82,7 @@ export class Program {
     this.program = program;
   }
 
-  deleteProgram() {
+  delete() {
     // Удаление фрагментного шейдера
     this.gl.deleteShader(this.fragmentShader);
     // Удаление вершинного шейдера
@@ -100,7 +102,17 @@ export class Program {
     transpose?: GLboolean;
     matrix4: mat4;
   }) {
-    const u_Uniform = this.gl.getUniformLocation(this.program, uniformName);
+    const u_Uniform = this.getUniformLocationOnce(uniformName);
     this.gl.uniformMatrix4fv(u_Uniform, transpose, matrix4);
+  }
+
+  private getUniformLocationOnce(uniformName: string): WebGLUniformLocation {
+    if (!this.uniformLocations.has(uniformName)) {
+      const location = this.gl.getUniformLocation(this.program, uniformName);
+      if (location) {
+        this.uniformLocations.set(uniformName, location);
+      }
+    }
+    return this.uniformLocations.get(uniformName)!;
   }
 }

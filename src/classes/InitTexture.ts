@@ -1,4 +1,6 @@
-export class InitTexture {
+import { Deletable } from "./interface/Deletable.ts";
+
+export class InitTexture implements Deletable {
   private readonly gl: WebGL2RenderingContext;
   private readonly texture: WebGLTexture;
   private readonly textureSlot: GLenum;
@@ -81,7 +83,7 @@ export class InitTexture {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
   }
 
-  deleteTexture() {
+  delete() {
     // Удаление текстуры
     this.gl.deleteTexture(this.texture);
   }

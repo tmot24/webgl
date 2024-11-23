@@ -1,5 +1,7 @@
 // Для индексов
-export class InitElementArrayBuffer {
+import { Deletable } from "./interface/Deletable.ts";
+
+export class InitElementArrayBuffer implements Deletable {
   private readonly gl: WebGL2RenderingContext;
   readonly type: number;
   readonly count: GLsizei;
@@ -30,7 +32,7 @@ export class InitElementArrayBuffer {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
   }
 
-  deleteBuffer() {
+  delete() {
     this.gl.deleteBuffer(this.buffer);
   }
 

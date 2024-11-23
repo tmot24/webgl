@@ -131,15 +131,15 @@ export const ClassProgramObject = memo(() => {
 
     return () => {
       // Удаление программы
-      colorCube.deleteProgram();
-      textureCube.deleteProgram();
+      colorCube.delete();
+      textureCube.delete();
       // Удаление буферов
-      vertex.deleteBuffer();
-      normal.deleteBuffer();
-      texCoord.deleteBuffer();
-      index.deleteBuffer();
+      vertex.delete();
+      normal.delete();
+      texCoord.delete();
+      index.delete();
       // Удаление текстуры
-      texture.deleteTexture();
+      texture.delete();
 
       if (animationId.current) {
         cancelAnimationFrame(animationId.current);

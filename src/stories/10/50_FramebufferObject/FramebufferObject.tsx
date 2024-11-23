@@ -160,17 +160,17 @@ export const FramebufferObject = memo(() => {
 
     return () => {
       // Удаление программы
-      programInstance.deleteProgram();
+      programInstance.delete();
       // Удаление буферов
-      vertexCube.deleteBuffer();
-      texCoordCube.deleteBuffer();
-      indexCube.deleteBuffer();
-      vertexPlane.deleteBuffer();
-      texCoordPlane.deleteBuffer();
-      indexPlane.deleteBuffer();
+      vertexCube.delete();
+      texCoordCube.delete();
+      indexCube.delete();
+      vertexPlane.delete();
+      texCoordPlane.delete();
+      indexPlane.delete();
       // Удаление текстуры
-      texture.deleteTexture();
-      fbo.deleteFramebufferTexture();
+      texture.delete();
+      fbo.delete();
 
       if (animationId.current) {
         cancelAnimationFrame(animationId.current);

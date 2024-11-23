@@ -1,7 +1,10 @@
-export class InitArrayBuffer {
+import { Deletable } from "./interface/Deletable.ts";
+
+export class InitArrayBuffer implements Deletable {
   private readonly gl: WebGL2RenderingContext;
   private readonly num: number;
   private readonly type: number;
+  private attributeLocations: Map<string, GLint> = new Map();
   readonly buffer: WebGLBuffer | null;
 
   constructor({
@@ -31,7 +34,7 @@ export class InitArrayBuffer {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 
-  deleteBuffer() {
+  delete() {
     this.gl.deleteBuffer(this.buffer);
   }
 
@@ -43,7 +46,10 @@ export class InitArrayBuffer {
     attributeName: string;
     program: WebGLProgram;
   }) {
-    const a_Attribute = this.gl.getAttribLocation(program, attributeName);
+    const a_Attribute = this.getAttributeLocationOnce({
+      attributeName,
+      program,
+    });
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
     // 4. Сохранить ссылку на буферный объект в переменной a_Position
     // а) index - определяет переменную-атрибут, которой будет выполнено присваивание
@@ -55,5 +61,19 @@ export class InitArrayBuffer {
     this.gl.vertexAttribPointer(a_Attribute, this.num, this.type, false, 0, 0);
     // 5. Разрешить присваивание переменной a_Attribute
     this.gl.enableVertexAttribArray(a_Attribute);
+  }
+
+  private getAttributeLocationOnce({
+    attributeName,
+    program,
+  }: {
+    attributeName: string;
+    program: WebGLProgram;
+  }): GLint {
+    if (!this.attributeLocations.has(attributeName)) {
+      const location = this.gl.getAttribLocation(program, attributeName);
+      this.attributeLocations.set(attributeName, location);
+    }
+    return this.attributeLocations.get(attributeName)!;
   }
 }

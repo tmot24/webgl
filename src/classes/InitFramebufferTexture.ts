@@ -1,5 +1,7 @@
 // Инициализировать объект буфера кадра (FBO)
-export class InitFramebufferTexture {
+import { Deletable } from "./interface/Deletable.ts";
+
+export class InitFramebufferTexture implements Deletable {
   private readonly gl: WebGL2RenderingContext;
   private readonly textureSlot: GLenum | null;
   private readonly depthBuffer: WebGLRenderbuffer | null;
@@ -10,12 +12,12 @@ export class InitFramebufferTexture {
     gl,
     width,
     height,
-    textureSlot,
+    textureSlot = gl.TEXTURE0,
   }: {
     gl: WebGL2RenderingContext;
     width: GLsizei;
     height: GLsizei;
-    textureSlot: GLenum;
+    textureSlot?: GLenum;
   }) {
     this.gl = gl;
     this.textureSlot = textureSlot;
@@ -142,7 +144,7 @@ export class InitFramebufferTexture {
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
   }
 
-  deleteFramebufferTexture() {
+  delete() {
     // Удалить объект буфера кадра
     this.gl.deleteFramebuffer(this.framebuffer);
     // Удалить объект буфера отображения
