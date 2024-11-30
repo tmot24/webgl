@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from "react";
 import vertexSource from "./shaders/vertex.vert?raw";
 import fragmentSource from "./shaders/fragment.frag?raw";
-import { mat4, quat, vec3 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { getRadianFromDegree } from "../../../common/getRadianFromDegree.ts";
 import { getAnimateAngle } from "../../../common/getAnimateAngle.ts";
 import { WebGL } from "../../../classes/WebGL.ts";
@@ -11,7 +11,7 @@ import { InitElementArrayBuffer } from "../../../classes/InitElementArrayBuffer.
 import { Fps } from "../../../fps/Fps.tsx";
 import objFile from "../../../resources/cube.obj?raw";
 import mtlFile from "../../../resources/cube.mtl?raw";
-import { parseObj } from "../../../fileReader/parseObj.ts";
+import { OBJParser } from "../../../fileReader/parseObjFile.ts";
 
 export const OBJViewer = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -27,7 +27,15 @@ export const OBJViewer = memo(() => {
       fragmentSource: fragmentSource,
     });
 
-    const { position, indices, normals } = parseObj({ objFile, mtlFile });
+    const result = OBJParser({
+      objFile,
+      mtlFiles: {
+        "cube.mtl": mtlFile,
+      },
+    });
+
+    const { webGLData, indices, colors } = result[0];
+    const [position, , normals] = webGLData;
 
     const vertex = new InitArrayBuffer({
       gl,
@@ -39,10 +47,11 @@ export const OBJViewer = memo(() => {
       data: new Float32Array(normals),
       num: 3,
     });
-    // const color = new InitArrayBuffer({
-    //   gl,
-    //   num: 4,
-    // });
+    const color = new InitArrayBuffer({
+      gl,
+      data: new Float32Array(colors),
+      num: 4,
+    });
     const index = new InitElementArrayBuffer({
       gl,
       data: new Uint8Array(indices),
@@ -84,14 +93,7 @@ export const OBJViewer = memo(() => {
       context.clear();
 
       const modelMatrix = mat4.create();
-      // Рассчитать матрицу модели
-      mat4.fromRotationTranslation(
-        modelMatrix,
-        // Поворот
-        quat.setAxisAngle(quat.create(), [0, 1, 0], radian),
-        // перемещение
-        vec3.fromValues(0, 0, 0),
-      );
+      mat4.rotateY(modelMatrix, modelMatrix, radian);
 
       const mvpMatrix = mat4.create();
       mat4.multiply(mvpMatrix, viewProjectionMatrix, modelMatrix);
@@ -104,6 +106,11 @@ export const OBJViewer = memo(() => {
       // Координаты нормали
       normal.initAttributeVariable({
         attributeName: "a_Normal",
+        program: instance.program,
+      });
+      // Цвет
+      color.initAttributeVariable({
+        attributeName: "a_Color",
         program: instance.program,
       });
       // Индексы привязки
@@ -136,7 +143,8 @@ export const OBJViewer = memo(() => {
       instance.delete();
       // Удаление буферов
       vertex.delete();
-      // color.delete();
+      normal.delete();
+      color.delete();
       index.delete();
 
       if (animationId.current) {

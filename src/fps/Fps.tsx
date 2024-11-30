@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
-const HEIGHT = 100;
-const WIDTH = 100;
+const HEIGHT = 22;
+const WIDTH = 67;
 
 export const Fps = () => {
   const ref = useRef<HTMLCanvasElement>(null);
