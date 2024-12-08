@@ -72,6 +72,11 @@ export class InitArrayBuffer implements Deletable {
   }): GLint {
     if (!this.attributeLocations.has(attributeName)) {
       const location = this.gl.getAttribLocation(program, attributeName);
+      if (location === -1) {
+        console.error(
+          `Не удалось найти местоположение атрибута: ${attributeName}`,
+        );
+      }
       this.attributeLocations.set(attributeName, location);
     }
     return this.attributeLocations.get(attributeName)!;
