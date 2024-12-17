@@ -11,7 +11,7 @@ import { InitElementArrayBuffer } from "../../../classes/InitElementArrayBuffer.
 import { Fps } from "../../../fps/Fps.tsx";
 import objFile from "../../../resources/cube/MyCube.obj?raw";
 import mtlFile from "../../../resources/cube/MyCube.mtl?raw";
-import { parseObjAndMtlForWebGL } from "../../../fileReader/parseObjFileModified.ts";
+import { parseObjAndMtlForWebGL } from "../../../fileReader/parseObjAndMtlForWebGL.ts";
 
 export const MyCube = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
