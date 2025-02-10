@@ -287,10 +287,10 @@ function drawTexturedCube({
   // Рассчитать матрицу проекта представления модели и передать ее в u_MvpMatrix
   const mvpMatrix = mat4.create();
   mat4.multiply(mvpMatrix, viewProjectionMatrixFBO, modelMatrix);
-  programInstance.uniformMatrix4fv = {
+  programInstance.uniformMatrix4fv({
     uniformName: "u_MvpMatrix",
     matrix4: mvpMatrix,
-  };
+  });
 
   drawTexturedObject({
     gl,
@@ -327,10 +327,10 @@ function drawTexturedPlane({
   // Рассчитать матрицу проекта представления модели и передать ее в u_MvpMatrix
   const mvpMatrix = mat4.create();
   mat4.multiply(mvpMatrix, viewProjectionMatrix, modelMatrix);
-  programInstance.uniformMatrix4fv = {
+  programInstance.uniformMatrix4fv({
     uniformName: "u_MvpMatrix",
     matrix4: mvpMatrix,
-  };
+  });
 
   drawTexturedObject({
     gl,

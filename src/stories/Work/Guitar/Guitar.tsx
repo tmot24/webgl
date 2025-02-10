@@ -120,16 +120,16 @@ export const Guitar = memo(() => {
           // Вычислить матрицу преобразования для нормалей;
           mat4.invert(normalMatrix, modelMatrix);
           // Передать матрицу преобразования для нормалей в u_NormalMatrix (необходимо транспонировать)
-          instance.uniformMatrix4fv = {
+          instance.uniformMatrix4fv({
             uniformName: "u_NormalMatrix",
             transpose: true,
             matrix4: normalMatrix,
-          };
+          });
 
-          instance.uniformMatrix4fv = {
+          instance.uniformMatrix4fv({
             uniformName: "u_MvpMatrix",
             matrix4: mvpMatrix,
-          };
+          });
 
           gl.drawElements(gl.TRIANGLES, index.count, index.type, 0);
         });
