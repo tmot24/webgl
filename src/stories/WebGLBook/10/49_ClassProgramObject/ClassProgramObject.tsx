@@ -296,20 +296,20 @@ function drawCube({
   // Вычислить матрицу преобразования для нормалей;
   mat4.invert(normalMatrix, modelMatrix);
   // Передать матрицу преобразования для нормалей в u_NormalMatrix (необходимо транспонировать)
-  programObject.uniformMatrix4fv = {
+  programObject.uniformMatrix4fv({
     uniformName: "u_NormalMatrix",
     transpose: true,
     matrix4: normalMatrix,
-  };
+  });
 
   // Рассчитать матрицу проекции вида модели и передать ее в u_MvpMatrix
   const mvpMatrix = mat4.create();
   mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
   mat4.multiply(mvpMatrix, mvpMatrix, modelMatrix);
-  programObject.uniformMatrix4fv = {
+  programObject.uniformMatrix4fv({
     uniformName: "u_MvpMatrix",
     matrix4: mvpMatrix,
-  };
+  });
 
   gl.drawElements(gl.TRIANGLES, index.count, index.type, 0);
 }

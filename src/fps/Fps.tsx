@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 const HEIGHT = 22;
 const WIDTH = 67;
 
-export const Fps = () => {
+export const Fps = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
   const animationId = useRef<number | null>(null);
 
@@ -69,4 +69,4 @@ export const Fps = () => {
       ref={ref}
     />
   );
-};
+});

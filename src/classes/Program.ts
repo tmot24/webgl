@@ -93,7 +93,7 @@ export class Program implements Deletable {
 
   // Передать матрицу в вершинный шейдер
   // (v - указывает на способность метода записать в переменную множество значений)
-  set uniformMatrix4fv({
+  uniformMatrix4fv({
     uniformName,
     transpose = false,
     matrix4,

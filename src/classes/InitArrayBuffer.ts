@@ -23,7 +23,7 @@ export class InitArrayBuffer implements Deletable {
     // 2. Указать типы буферных объектов
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     // 3. Записать данные в буферные объекты
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
 
     this.gl = gl;
     this.buffer = buffer;

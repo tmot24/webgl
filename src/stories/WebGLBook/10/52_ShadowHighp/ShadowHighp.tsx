@@ -186,10 +186,10 @@ export const ShadowHighp = memo(() => {
       // Передайте 0, так как gl.TEXTURE0 включен
       gl.uniform1i(u_ShadowMap, 0);
       // Нарисуем треугольник и плоскость (для обычного рисования)
-      instance.uniformMatrix4fv = {
+      instance.uniformMatrix4fv({
         uniformName: "u_MvpMatrixFromLight",
         matrix4: mvpMatrixFromLightTriangle,
-      };
+      });
 
       drawTriangle({
         gl,
@@ -199,10 +199,10 @@ export const ShadowHighp = memo(() => {
         viewProjectionMatrix,
       });
 
-      instance.uniformMatrix4fv = {
+      instance.uniformMatrix4fv({
         uniformName: "u_MvpMatrixFromLight",
         matrix4: mvpMatrixFromLightPlane,
-      };
+      });
 
       drawPlane({
         gl,
@@ -354,10 +354,10 @@ function draw({
   }
   index.initBuffer();
 
-  instance.uniformMatrix4fv = {
+  instance.uniformMatrix4fv({
     uniformName: "u_MvpMatrix",
     matrix4: mvpMatrix,
-  };
+  });
 
   gl.drawElements(gl.TRIANGLES, index.count, index.type, 0);
 }
