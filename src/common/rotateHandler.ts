@@ -1,5 +1,6 @@
 const INTERPOLATION = 0.7; // Степень интерполяции
 
+// Не забыть удалить canvas.onmousemove = null
 export const rotateHandler = ({
   canvas,
   currentAngle,

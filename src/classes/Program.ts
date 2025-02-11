@@ -79,6 +79,14 @@ export class Program implements Deletable {
     // 7. Сообщает что объект программы готов к использованию
     gl.useProgram(program);
 
+    // Не знаю насколько это целесообразно
+    /*
+    // Удаление фрагментного шейдера
+    this.gl.deleteShader(this.fragmentShader);
+    // Удаление вершинного шейдера
+    this.gl.deleteShader(this.vertexShader);
+    */
+
     this.program = program;
   }
 

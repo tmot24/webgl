@@ -95,6 +95,11 @@ export const HelloCube = memo(() => {
       vertex.delete();
       color.delete();
       index.delete();
+      // Удаление обработчиков событий
+      canvas.onmousedown = null;
+      canvas.onmousemove = null;
+      canvas.onmouseup = null;
+      canvas.onmouseleave = null;
     };
   }, []);
 

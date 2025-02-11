@@ -11,24 +11,31 @@ export class InitArrayBuffer implements Deletable {
     gl,
     data,
     num,
-    type = gl.FLOAT,
+    dataType = gl.FLOAT,
+    drawType = gl.STATIC_DRAW,
   }: {
     gl: WebGL2RenderingContext;
     data: Float32Array | Uint8Array;
     num: number;
-    type?: number;
+    dataType?: number;
+    /*    gl.STATIC_DRAW → если данные загружаются один раз и не изменяются.
+    ✅ Подходит для цветов (colorsData), вершин (verticesData), индексов (indicesData).
+    gl.DYNAMIC_DRAW → если данные часто изменяются (например, каждый кадр).
+    ✅ Используется для переменных данных (например, анимация вершин, частиц).
+    gl.STREAM_DRAW → для данных, которые меняются почти в каждом кадре, но используются только один раз.*/
+    drawType?: GLenum;
   }) {
     // 1. Создать буферный объект
     const buffer = gl.createBuffer();
     // 2. Указать типы буферных объектов
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     // 3. Записать данные в буферные объекты
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, data, drawType);
 
     this.gl = gl;
     this.buffer = buffer;
     this.num = num;
-    this.type = type;
+    this.type = dataType;
 
     // Отвязать объект буфера
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
