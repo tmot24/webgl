@@ -124,8 +124,6 @@ function draw({
   baseMvpMatrix: mat4;
   currentAngle: [number, number];
 }) {
-  const { gl } = context;
-
   const mvpMatrix = mat4.create();
   mat4.copy(mvpMatrix, baseMvpMatrix); // Обновляем mvpMatrix перед вращениями
 
@@ -137,6 +135,5 @@ function draw({
     matrix4: mvpMatrix,
   });
 
-  context.clear();
-  gl.drawElements(gl.TRIANGLES, index.count, index.type, 0);
+  context.draw({ count: index.count });
 }

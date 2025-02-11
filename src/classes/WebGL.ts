@@ -41,4 +41,19 @@ export class WebGL {
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
+
+  draw({
+    mode = this.gl.TRIANGLES,
+    count,
+    type = this.gl.UNSIGNED_BYTE,
+    offset = 0,
+  }: {
+    mode?: GLenum;
+    count: GLsizei;
+    type?: GLenum;
+    offset?: GLintptr;
+  }) {
+    this.clear();
+    this.gl.drawElements(mode, count, type, offset);
+  }
 }
