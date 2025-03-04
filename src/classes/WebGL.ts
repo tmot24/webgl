@@ -53,7 +53,7 @@ export class WebGL {
     type?: GLenum;
     offset?: GLintptr;
   }) {
-    this.clear();
+    // this.clear(); Есть случаи, когда очищать нельзя
     this.gl.drawElements(mode, count, type, offset);
   }
 }

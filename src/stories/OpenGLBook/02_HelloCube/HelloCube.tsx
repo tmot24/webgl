@@ -135,5 +135,6 @@ function draw({
     matrix4: mvpMatrix,
   });
 
+  context.clear();
   context.draw({ count: index.count });
 }
