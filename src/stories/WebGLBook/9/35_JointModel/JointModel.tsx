@@ -52,7 +52,7 @@ export const JointModel = memo(() => {
     });
     index.initBuffer();
 
-    const n = indicesData.length;
+    const n = index.count;
 
     const projectionMatrix = mat4.create(); // Матрица проекции (важно считать отдельно)
     const viewMatrix = mat4.create(); // Матрица вида (важно считать отдельно)
@@ -99,11 +99,6 @@ export const JointModel = memo(() => {
       vertex.delete();
       normal.delete();
       index.delete();
-      // Удаление обработчиков событий
-      canvas.onmousedown = null;
-      canvas.onmousemove = null;
-      canvas.onmouseup = null;
-      canvas.onmouseleave = null;
     };
   }, []);
 
@@ -244,18 +239,19 @@ function drawBox({
   // Вычислить матрицу модели вида проекции
   mat4.multiply(mvpMatrix, viewProjMatrix, modelMatrix);
 
-  mat4.invert(normalMatrix, modelMatrix);
-
   instance.uniformMatrix4fv({
     uniformName: "u_MvpMatrix",
     matrix4: mvpMatrix,
   });
 
+  // Вычислить матрицу нормалей
+  mat4.invert(normalMatrix, modelMatrix);
+  // Передать матрицу преобразования для нормалей в u_NormalMatrix (необходимо транспонировать)
   instance.uniformMatrix4fv({
     uniformName: "u_NormalMatrix",
     transpose: true,
     matrix4: normalMatrix,
   });
-
+  // Нарисовать
   context.draw({ count: n });
 }
